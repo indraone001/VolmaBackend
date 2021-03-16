@@ -7,7 +7,7 @@ module.exports = {
       connection: {
         host: 'localhost',
         port: '3306',
-        database: 'tokobuku',
+        database: 'Volma',
         user: 'root',
         password: '',
         charset: 'utf8'
