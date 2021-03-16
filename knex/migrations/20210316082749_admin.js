@@ -2,7 +2,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable('admin', table => {
         table.increments('id_admin');
-        table.foreign('id_mhs').references('mahasiswa.id_mhs')
+        table.integer('id_mhs').unsigned().references('mahasiswa.id_mhs')
         table.timestamps();
     })
 };
