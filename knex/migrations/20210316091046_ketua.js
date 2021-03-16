@@ -2,7 +2,7 @@
 exports.up = function(knex) {
     return knex.schema.createTable('ketua', table => {
         table.increments('id_ketua');
-        table.foreign('id_mhs').references('mahasiswa.id_mhs')
+        table.integer('id_mhs');
         table.timestamps();
     })
 };

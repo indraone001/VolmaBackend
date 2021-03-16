@@ -1,7 +1,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable('pemilih', table => {
     table.increments('id_pemilih');
-    table.foreign('id_mhs').references('id_mhs').inTable('mahasiswa');
+    table.integer('id_mhs');
     table.string('password');
     table.boolean('status');
   })  
