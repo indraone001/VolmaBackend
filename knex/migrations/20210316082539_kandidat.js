@@ -6,6 +6,7 @@ exports.up = function(knex) {
     table.integer('no_urut');
     table.string('visi');
     table.text('misi');
+    table.timestamps();
   })  
 };
 

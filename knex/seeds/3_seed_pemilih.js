@@ -1,9 +1,9 @@
 exports.seed = function (knex) {
   // Deletes ALL existing entries
-  return knex('admin').del()
+  return knex('pemilih').del()
     .then(function () {
       // Inserts seed entries
-      return knex('admin').insert([{
+      return knex('pemilih').insert([{
           id_pemilih: 1,
           id_mhs: 1,
           password: 1234,
