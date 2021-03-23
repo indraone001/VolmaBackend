@@ -6,7 +6,7 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('mahasiswa').insert([
         {
-          id: 1,
+          id_mhs: 1,
           nim: '1301180097',
           nama: 'Deri Indrawan',
           jurusan: 'S1 Informatika',
@@ -15,7 +15,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 2,
+          id_mhs: 2,
           nim: '1301184369',
           nama: 'Ananta Ihza Ramadhan',
           jurusan: 'S1 Informatika',
@@ -24,7 +24,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 3,
+          id_mhs: 3,
           nim: '1301180432',
           nama: 'Muhammad Salman Farhan',
           jurusan: 'S1 Informatika',
@@ -33,7 +33,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 4,
+          id_mhs: 4,
           nim: '1301184026',
           nama: 'Ihsan Ahsanu Amala',
           jurusan: 'S1 Informatika',
@@ -42,7 +42,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 5,
+          id_mhs: 5,
           nim: '1301184008',
           nama: 'Faiza Aulia Rahma Putra',
           jurusan: 'S1 Informatika',
@@ -51,7 +51,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 6,
+          id_mhs: 6,
           nim: '1301180032',
           nama: 'Andi',
           jurusan: 'S1 Informatika',
@@ -60,7 +60,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 7,
+          id_mhs: 7,
           nim: '1301184302',
           nama: 'Joko',
           jurusan: 'S1 Informatika',
@@ -69,7 +69,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 8,
+          id_mhs: 8,
           nim: '1301184493',
           nama: 'Joni',
           jurusan: 'S1 Informatika',
@@ -78,7 +78,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 9,
+          id_mhs: 9,
           nim: '1301180021',
           nama: 'Jeki',
           jurusan: 'S1 Informatika',
@@ -87,7 +87,7 @@ exports.seed = function(knex) {
           updated_at: knex.fn.now(),
         },
         {
-          id: 10,
+          id_mhs: 10,
           nim: '130118444',
           nama: 'Lina',
           jurusan: 'S1 Informatika',
