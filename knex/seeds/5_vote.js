@@ -21,7 +21,6 @@ exports.seed = function (knex) {
           id_vote: 3,
           id_pemilih: 3,
           id_kandidat: 1,
-          status: 0,
           created_at: knex.fn.now(),
           updated_at: knex.fn.now(),
         },
