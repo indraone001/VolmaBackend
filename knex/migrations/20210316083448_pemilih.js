@@ -4,6 +4,7 @@ exports.up = function(knex) {
     table.integer('id_mhs').unsigned().references('mahasiswa.id_mhs');
     table.string('password');
     table.boolean('status');
+    table.timestamps();
   })  
 };
 
