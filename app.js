@@ -18,5 +18,8 @@ app.use('/', routes)
 app.use('/book', routes)
 app.use('/book/:id', routes)
 
+app.use('/mahasiswa', routes)
+app.use('/mahasiswa/:id', routes)
+
 // Turn on that server!
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

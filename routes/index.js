@@ -86,4 +86,79 @@ routes.delete('/book/:id', async (req, res) => {
     }
 })
 
+routes.get('/mahasiswa', async(req, res) => {
+    try {
+        let mhs = await knex('mahasiswa')
+        res.status(200).send({
+            success: true,
+            data: mhs
+        })
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+routes.post('/mahasiswa', async(req, res) => {
+    try {
+        let mhs = req.body
+
+        // TODO: add handling for existing nim
+        let id = await knex('mahasiswa').insert({
+            "nim": mhs.nim,
+            "nama": mhs.nama,
+            "jurusan": mhs.jurusan,
+            "angkatan": mhs.angkatan,
+            "created_at": knex.fn.now(),
+            "updated_at": knex.fn.now(),
+        })
+
+        res.status(201).send({
+            success: true,
+            message: "Successfully insert mahasiswa",
+            data: { id: id[0], mhs }
+        })
+    } catch (e) {
+        console.log(e)
+        next(e)
+    }
+})
+
+routes.put('/mahasiswa/:id', async(req, res) => {
+    try {
+        let mhs = req.body
+        let id_mhs = req.params.id
+
+        let id = await knex('mahasiswa').where('id_mhs', id_mhs).update({
+            "nim": mhs.nim,
+            "nama": mhs.nama,
+            "jurusan": mhs.jurusan,
+            "angkatan": mhs.angkatan,
+            "updated_at": knex.fn.now(),
+        })
+
+        res.status(200).send({
+            success: true,
+            message: 'Successfully update mahasiswa',
+            data: { id: id[0], mhs }
+        })
+    } catch (e) {
+        console.log(e)
+        next(e)
+    }
+})
+
+routes.delete('/mahasiswa/:id', async(req, res) => {
+    try {
+        await knex('mahasiswa').where('id_mhs', req.params.id).del()
+
+        res.status(200).send({
+            success: true,
+            message: 'Successfully delete mahasiswa'
+        })
+    } catch (e) {
+        console.log(e)
+        next(e)
+    }
+})
+
 module.exports = routes;
