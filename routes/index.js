@@ -172,4 +172,26 @@ routes.delete('/kandidat/:id', async (req, res) => {
     }
 })
 
+routes.post('/login', async (req, res) => {
+    try {
+        let nim = req.body.nim;
+        let password = req.body.password;
+
+        let data = await knex('mahasiswa').where('nim', nim)
+
+        if(data[0].password == password){
+            res.status(200).send({
+                success: true,
+            });
+        }else{
+            res.status(404).send({
+                success: false,
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        next(e)
+    }
+})
+
 module.exports = routes;

@@ -6,6 +6,7 @@ exports.up = function(knex) {
         table.string('nama');
         table.string('jurusan');
         table.string('angkatan');
+        table.string('password');
         table.timestamps();
     })
 };
