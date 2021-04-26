@@ -2,7 +2,7 @@
 const express = require('express')
 const app = express()
 const routes = require('./routes')
-const port = 80
+const port = 3000
 
 //body parser
 const bodyParser = require('body-parser');
@@ -19,4 +19,4 @@ app.use('/book', routes)
 app.use('/book/:id', routes)
 
 // Turn on that server!
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(process.env.PORT || port, () => console.log(`Example app listening on port ${port}!`))
