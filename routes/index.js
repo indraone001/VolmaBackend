@@ -4,10 +4,11 @@ const routes = require('express').Router();
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-        host: '127.0.0.1',
-        database: 'Volma',
-        user: 'root',
-        password: '',
+        host: "db4free.net",
+        port: "3306",
+        database: "volma01",
+        user: "volma01",
+        password: "volmadb4free",
     }
 });
 
