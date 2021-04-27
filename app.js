@@ -1,8 +1,12 @@
 // Bring in our dependencies
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const routes = require('./routes')
 const port = 3000
+
+//cors
+app.use(cors())
 
 //body parser
 const bodyParser = require('body-parser');
