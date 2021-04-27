@@ -87,89 +87,75 @@ routes.delete('/book/:id', async (req, res) => {
     }
 })
 
-routes.post('/kandidat', async (req, res) => {
+routes.get('/mahasiswa', async(req, res) => {
     try {
-        let id_ketua = req.body.id_ketua;
-        let id_wakil = req.body.id_wakil;
-        let no_urut = req.body.no_urut;
-        let visi = req.body.visi;
-        let misi = req.body.misi;
+        let mhs = await knex('mahasiswa')
+        res.status(200).send({
+            success: true,
+            data: mhs
+        })
+    } catch (e) {
+        console.log(e)
+    }
+})
 
-        let id = await knex('kandidat').insert({
-            "id_ketua": id_ketua,
-            "id_wakil": id_wakil,
-            "no_urut": no_urut,
-            "visi": visi,
-            "misi": misi,
+routes.post('/mahasiswa', async(req, res) => {
+    try {
+        let mhs = req.body
+
+        // TODO: add handling for existing nim
+        let id = await knex('mahasiswa').insert({
+            "nim": mhs.nim,
+            "nama": mhs.nama,
+            "jurusan": mhs.jurusan,
+            "angkatan": mhs.angkatan,
             "created_at": knex.fn.now(),
             "updated_at": knex.fn.now(),
         })
+
         res.status(201).send({
             success: true,
-            data : {
-                id: id[0],
-                id_ketua,
-                id_wakil,
-                no_urut,
-                visi,
-                misi,
-            }
-        });
+            message: "Successfully insert mahasiswa",
+            data: { id: id[0], mhs }
+        })
     } catch (e) {
-        console.log(e);
-        next(e)
+        console.log(e)
     }
 })
 
-routes.get('/kandidat', async (req, res) => {
+routes.put('/mahasiswa/:id', async(req, res) => {
     try {
-        let kandidat = await knex('kandidat');
+        let mhs = req.body
+        let id_mhs = req.params.id
+
+        let id = await knex('mahasiswa').where('id_mhs', id_mhs).update({
+            "nim": mhs.nim,
+            "nama": mhs.nama,
+            "jurusan": mhs.jurusan,
+            "angkatan": mhs.angkatan,
+            "updated_at": knex.fn.now(),
+        })
+
         res.status(200).send({
             success: true,
-            data : kandidat,
-        });
+            message: 'Successfully update mahasiswa',
+            data: { id: id[0], mhs }
+        })
     } catch (e) {
-        console.log(e);
+        console.log(e)
     }
 })
 
-routes.put('/kandidat/:id', async (req, res) => {
+routes.delete('/mahasiswa/:id', async(req, res) => {
     try {
-        let id = req.params.id;
-        let id_ketua = req.body.id_ketua;
-        let id_wakil = req.body.id_wakil;
-        let no_urut = req.body.no_urut;
-        let visi = req.body.visi;
-        let misi = req.body.misi;
+        await knex('mahasiswa').where('id_mhs', req.params.id).del()
 
-        let kandidat = await knex('kandidat').where('id_kandidat', id).update({
-            "id_ketua": id_ketua,
-            "id_wakil": id_wakil,
-            "no_urut": no_urut,
-            "visi": visi,
-            "misi": misi,
-        });
-
-        res.status(201).send({
+        res.status(200).send({
             success: true,
-        });
+            message: 'Successfully delete mahasiswa'
+        })
     } catch (e) {
-        console.log(e);
-        next(e)
-    }
-})
-
-routes.delete('/kandidat/:id', async (req, res) => {
-    try {
-        let id = req.params.id;
-
-        await knex('kandidat').where('id_kandidat', id).del()
-        res.status(201).send({
-            success: true,
-        });
-    } catch (e) {
-        console.log(e);
-        next(e)
+        console.log(e)
     }
 })
 
