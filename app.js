@@ -19,4 +19,4 @@ app.use('/book', routes)
 app.use('/book/:id', routes)
 
 // Turn on that server!
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(process.env.PORT || port, () => console.log(`Example app listening on port ${port}!`))
