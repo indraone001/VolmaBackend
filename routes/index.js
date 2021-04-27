@@ -4,15 +4,16 @@ const routes = require('express').Router();
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-        host: '127.0.0.1',
-        database: 'Volma',
-        user: 'root',
-        password: '',
+        host: "db4free.net",
+        port: "3306",
+        database: "volma01",
+        user: "volma01",
+        password: "volmadb4free",
     }
 });
 
 //route
-routes.get('/', (req, res) => res.send('Hello World!'))
+routes.get('/', (req, res) => res.send('this is volma app'))
 
 routes.get('/book', async (req, res) => {
     try {
@@ -119,7 +120,6 @@ routes.post('/mahasiswa', async(req, res) => {
         })
     } catch (e) {
         console.log(e)
-        next(e)
     }
 })
 
@@ -143,7 +143,6 @@ routes.put('/mahasiswa/:id', async(req, res) => {
         })
     } catch (e) {
         console.log(e)
-        next(e)
     }
 })
 
@@ -157,6 +156,27 @@ routes.delete('/mahasiswa/:id', async(req, res) => {
         })
     } catch (e) {
         console.log(e)
+    }
+})
+
+routes.post('/login', async (req, res) => {
+    try {
+        let nim = req.body.nim;
+        let password = req.body.password;
+
+        let data = await knex('mahasiswa').where('nim', nim)
+
+        if(data[0].password == password){
+            res.status(200).send({
+                success: true,
+            });
+        }else{
+            res.status(404).send({
+                success: false,
+            });
+        }
+    } catch (e) {
+        console.log(e);
         next(e)
     }
 })
