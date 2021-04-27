@@ -13,7 +13,7 @@ const knex = require('knex')({
 });
 
 //route
-routes.get('/', (req, res) => res.send('Hello World!'))
+routes.get('/', (req, res) => res.send('this is volma app'))
 
 routes.get('/book', async (req, res) => {
     try {

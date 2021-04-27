@@ -20,6 +20,7 @@ exports.seed = function(knex) {
           nama: 'Ananta Ihza Ramadhan',
           jurusan: 'S1 Informatika',
           angkatan: '2018',
+          password: '12345678',
           created_at: knex.fn.now(),
           updated_at: knex.fn.now(),
         },
