@@ -1,9 +1,11 @@
 # VolmaBackend
 Backend for Volma App
 
+# Project Setup
 ## Update dependency
 `npm update`
 
+# Knex Migration and Seeds
 ## make migration
 `knex migrate:make migration_name`
 
