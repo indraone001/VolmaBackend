@@ -1,4 +1,4 @@
-
+// table kandidat seeding
 exports.seed = function(knex) {
   // Deletes ALL existing entries
   return knex('kandidat').del()
