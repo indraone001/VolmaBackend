@@ -110,6 +110,7 @@ routes.post('/kandidat', async (req, res) => {
         // body & param request
         let id_ketua = req.body.id_ketua;
         let id_wakil = req.body.id_wakil;
+        let nama_wakil = req.body.nama_wakil;
         let no_urut = req.body.no_urut;
         let visi = req.body.visi;
         let misi = req.body.misi;
@@ -118,6 +119,7 @@ routes.post('/kandidat', async (req, res) => {
         let id = await knex('kandidat').insert({
             "id_ketua": id_ketua,
             "id_wakil": id_wakil,
+            "nama_wakil": nama_wakil,
             "no_urut": no_urut,
             "visi": visi,
             "misi": misi,
@@ -132,6 +134,7 @@ routes.post('/kandidat', async (req, res) => {
                 id: id[0],
                 id_ketua,
                 id_wakil,
+                nama_wakil,
                 no_urut,
                 visi,
                 misi,
@@ -147,12 +150,12 @@ routes.post('/kandidat', async (req, res) => {
 routes.get('/kandidat', async (req, res) => {
     try {
         //get all kandidat
-        let kandidat = await knex('kandidat');
+        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('no_urut','kandidat.id_ketua','kandidat.id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
 
         //response
         res.status(200).send({
             success: true,
-            data : kandidat,
+            data : data,
         });
     } catch (e) {
         //error log
@@ -166,6 +169,7 @@ routes.put('/kandidat/:id', async (req, res) => {
         let id = req.params.id;
         let id_ketua = req.body.id_ketua;
         let id_wakil = req.body.id_wakil;
+        let nama_wakil = req.body.nama_wakil;
         let no_urut = req.body.no_urut;
         let visi = req.body.visi;
         let misi = req.body.misi;
@@ -174,6 +178,7 @@ routes.put('/kandidat/:id', async (req, res) => {
         let kandidat = await knex('kandidat').where('id_kandidat', id).update({
             "id_ketua": id_ketua,
             "id_wakil": id_wakil,
+            "nama_wakil": nama_wakil,
             "no_urut": no_urut,
             "visi": visi,
             "misi": misi,
@@ -237,6 +242,90 @@ routes.post('/login', async (req, res) => {
         //error log
         console.log(e);
         next(e)
+    }
+})
+
+//pemilih routes controller
+routes.get('/pemilih', async(req, res) => {
+    try {
+        let data = await knex('pemilih').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'pemilih.id_mhs').select('id_pemilih', 'pemilih.id_mhs','nim', 'nama', 'mahasiswa.password', 'status');
+
+        res.status(200).send({
+            success: true,
+            data: data
+        })
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+//pemilih random password
+routes.get('/pemilih/:id', async(req, res) => {
+    try {
+       let id = req.params.id;
+       //TODO : add bcrypt for password
+       let password = 'hello';
+
+        await knex('mahasiswa').where('id_mhs', id).update({
+            "password": password,
+        });
+
+        res.status(201).send({
+            success: true,
+            data: password
+        })
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+//pemilih Dashboard
+routes.get('/dashboard', async(req, res) => {
+    try {
+        //count jumlah pemilih
+        const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
+        //select count pemilih where status = 1
+        const voted = await knex('pemilih').count('id_pemilih AS jumlah').where('status', 1);
+        const total = ((voted[0].jumlah/jumlah_pemilih[0].jumlah)*100).toFixed(2);
+        //select count kandidat
+        const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
+        //select periode pemilihan
+
+        res.status(201).send({
+            success : true,
+            data : {
+                jumlah_pemilih: jumlah_pemilih[0].jumlah,
+                voted: total,
+                kandidat: kandidat[0].jumlah
+            },
+        })
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+//result voting
+routes.get('/result', async(req, res) => {
+    try {
+        //count jumlah pemilih
+        const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
+        //select count pemilih where status = 1
+        const voted = await knex('pemilih').count('id_pemilih AS jumlah').where('status', 1);
+        const total = ((voted[0].jumlah/jumlah_pemilih[0].jumlah)*100).toFixed(2);
+        //select count kandidat
+        const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
+        //select periode pemilihan
+
+        res.status(201).send({
+            success : true,
+            data : {
+                jumlah_pemilih: jumlah_pemilih[0].jumlah,
+                voted: total,
+                kandidat: kandidat[0].jumlah
+            },
+        })
+    } catch (e) {
+        console.log(e)
     }
 })
 
