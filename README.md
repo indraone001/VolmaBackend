@@ -1,20 +1,22 @@
 # VolmaBackend
 Backend for Volma App
 
-## Update dependency
+## Project Setup
+### Update dependency
 `npm update`
 
-## make migration
+## Knex Migration and Seeds
+### make migration
 `knex migrate:make migration_name`
 
-## generate migration
+### generate migration
 `knex migrate:latest`
 
-## generate rollback
+### generate rollback
 `knex migrate:rollback`
 
-## Seeding
+### Seeding
 `knex seed:make seed_name`
 
-## Generate seed
+### Generate seed
 `knex seed:run `
