@@ -5,6 +5,7 @@ exports.up = function(knex) {
     // columns: id_pemilih, id_mhs, password, status, time
     table.increments('id_pemilih');
     table.integer('id_mhs').unsigned().references('mahasiswa.id_mhs');
+    table.string('password');
     table.boolean('status');
     table.timestamps();
   })  
