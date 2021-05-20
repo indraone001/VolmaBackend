@@ -1,5 +1,6 @@
 //express require
 const routes = require('express').Router();
+const bcrypt = require('bcrypt');
 
 //db connection
 const knex = require('knex')({
@@ -11,6 +12,13 @@ const knex = require('knex')({
         user: "volma01",
         password: "volmadb4free",
     }
+    // connection: {
+    //     host: 'localhost',
+    //     port: '3306',
+    //     database: 'Volma',
+    //     user: 'root',
+    //     password: ''
+    //   },
 });
 
 //routes
@@ -225,12 +233,23 @@ routes.post('/login', async (req, res) => {
         let data = await knex('mahasiswa').where('nim', nim)
 
         //compare password
-        //Task: password encrypt
-        //Task: response with data
-        if(data[0].password == password){
+        if(bcrypt.compareSync(password, data[0].password)){
+            //get admin
+            let admin = false;
+            let i = 0;
+            const role = await knex('admin');
+            while (i <= data.length+1) {
+                console.log(data[0].id_mhs, ' = ',role[i].id_mhs)
+                if(data[0].id_mhs == role[i].id_mhs){
+                    admin = true;
+                }
+                i++;
+            };
             //success response
             res.status(200).send({
                 success: true,
+                data: data,
+                admin: admin
             });
         }else{
             //failed response
@@ -263,11 +282,12 @@ routes.get('/pemilih', async(req, res) => {
 routes.get('/pemilih/:id', async(req, res) => {
     try {
        let id = req.params.id;
-       //TODO : add bcrypt for password
-       let password = 'hello';
+
+       let password = (Math.floor(100000 + Math.random() * 900000)).toString();
+       const hash = bcrypt.hashSync(password, 10);
 
         await knex('mahasiswa').where('id_mhs', id).update({
-            "password": password,
+            "password": hash,
         });
 
         res.status(201).send({
