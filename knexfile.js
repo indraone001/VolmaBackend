@@ -5,6 +5,13 @@ module.exports = {
   
   development: {
     client: 'mysql',
+    // connection: {
+    //   host: 'db4free.net',
+    //   port: '3306',
+    //   database: 'volma01',
+    //   user: 'volma01',
+    //   password: 'volmadb4free'
+    // },
     connection: {
       host: 'localhost',
       port: '3306',

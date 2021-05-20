@@ -5,11 +5,11 @@ const routes = require('express').Router();
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-        host: "localhost",
+        host: "db4free.net",
         port: "3306",
-        database: "Volma",
-        user: "root",
-        password: "",
+        database: "volma01",
+        user: "volma01",
+        password: "volmadb4free",
     }
 });
 
@@ -150,7 +150,7 @@ routes.post('/kandidat', async (req, res) => {
 routes.get('/kandidat', async (req, res) => {
     try {
         //get all kandidat
-        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('id_kandidat', 'no_urut','id_ketua','id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
+        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('no_urut','kandidat.id_ketua','kandidat.id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
 
         //response
         res.status(200).send({
@@ -280,31 +280,6 @@ routes.get('/pemilih/:id', async(req, res) => {
 })
 
 //pemilih Dashboard
-routes.get('/dashboard', async(req, res) => {
-    try {
-        //count jumlah pemilih
-        const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
-        //select count pemilih where status = 1
-        const voted = await knex('pemilih').count('id_pemilih AS jumlah').where('status', 1);
-        const total = ((voted[0].jumlah/jumlah_pemilih[0].jumlah)*100).toFixed(2);
-        //select count kandidat
-        const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
-        //select periode pemilihan
-
-        res.status(201).send({
-            success : true,
-            data : {
-                jumlah_pemilih: jumlah_pemilih[0].jumlah,
-                voted: total,
-                kandidat: kandidat[0].jumlah
-            },
-        })
-    } catch (e) {
-        console.log(e)
-    }
-})
-
-// dashboard
 routes.get('/dashboard', async(req, res) => {
     try {
         //count jumlah pemilih
