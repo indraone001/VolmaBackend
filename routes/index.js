@@ -1,16 +1,24 @@
 //express require
 const routes = require('express').Router();
+const bcrypt = require('bcrypt');
 
 //db connection
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-        host: "localhost",
+        host: "db4free.net",
         port: "3306",
-        database: "Volma",
-        user: "root",
-        password: "",
+        database: "volma01",
+        user: "volma01",
+        password: "volmadb4free",
     }
+    // connection: {
+    //     host: 'localhost',
+    //     port: '3306',
+    //     database: 'Volma',
+    //     user: 'root',
+    //     password: ''
+    //   },
 });
 
 //routes
@@ -150,7 +158,7 @@ routes.post('/kandidat', async (req, res) => {
 routes.get('/kandidat', async (req, res) => {
     try {
         //get all kandidat
-        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('id_kandidat', 'no_urut','id_ketua','id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
+        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('no_urut','kandidat.id_ketua','kandidat.id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
 
         //response
         res.status(200).send({
@@ -225,12 +233,23 @@ routes.post('/login', async (req, res) => {
         let data = await knex('mahasiswa').where('nim', nim)
 
         //compare password
-        //Task: password encrypt
-        //Task: response with data
-        if(data[0].password == password){
+        if(bcrypt.compareSync(password, data[0].password)){
+            //get admin
+            let admin = false;
+            let i = 0;
+            const role = await knex('admin');
+            while (i <= data.length+1) {
+                console.log(data[0].id_mhs, ' = ',role[i].id_mhs)
+                if(data[0].id_mhs == role[i].id_mhs){
+                    admin = true;
+                }
+                i++;
+            };
             //success response
             res.status(200).send({
                 success: true,
+                data: data,
+                admin: admin
             });
         }else{
             //failed response
@@ -263,11 +282,12 @@ routes.get('/pemilih', async(req, res) => {
 routes.get('/pemilih/:id', async(req, res) => {
     try {
        let id = req.params.id;
-       //TODO : add bcrypt for password
-       let password = 'hello';
+
+       let password = (Math.floor(100000 + Math.random() * 900000)).toString();
+       const hash = bcrypt.hashSync(password, 10);
 
         await knex('mahasiswa').where('id_mhs', id).update({
-            "password": password,
+            "password": hash,
         });
 
         res.status(201).send({
@@ -280,31 +300,6 @@ routes.get('/pemilih/:id', async(req, res) => {
 })
 
 //pemilih Dashboard
-routes.get('/dashboard', async(req, res) => {
-    try {
-        //count jumlah pemilih
-        const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
-        //select count pemilih where status = 1
-        const voted = await knex('pemilih').count('id_pemilih AS jumlah').where('status', 1);
-        const total = ((voted[0].jumlah/jumlah_pemilih[0].jumlah)*100).toFixed(2);
-        //select count kandidat
-        const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
-        //select periode pemilihan
-
-        res.status(201).send({
-            success : true,
-            data : {
-                jumlah_pemilih: jumlah_pemilih[0].jumlah,
-                voted: total,
-                kandidat: kandidat[0].jumlah
-            },
-        })
-    } catch (e) {
-        console.log(e)
-    }
-})
-
-// dashboard
 routes.get('/dashboard', async(req, res) => {
     try {
         //count jumlah pemilih
