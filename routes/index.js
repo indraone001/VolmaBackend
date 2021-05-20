@@ -5,20 +5,20 @@ const bcrypt = require('bcrypt');
 //db connection
 const knex = require('knex')({
     client: 'mysql',
-    connection: {
-        host: "db4free.net",
-        port: "3306",
-        database: "volma01",
-        user: "volma01",
-        password: "volmadb4free",
-    }
     // connection: {
-    //     host: 'localhost',
-    //     port: '3306',
-    //     database: 'Volma',
-    //     user: 'root',
-    //     password: ''
-    //   },
+    //     host: "db4free.net",
+    //     port: "3306",
+    //     database: "volma01",
+    //     user: "volma01",
+    //     password: "volmadb4free",
+    // }
+    connection: {
+        host: 'localhost',
+        port: '3306',
+        database: 'Volma',
+        user: 'root',
+        password: ''
+      },
 });
 
 //routes
@@ -239,7 +239,6 @@ routes.post('/login', async (req, res) => {
             let i = 0;
             const role = await knex('admin');
             while (i <= data.length+1) {
-                console.log(data[0].id_mhs, ' = ',role[i].id_mhs)
                 if(data[0].id_mhs == role[i].id_mhs){
                     admin = true;
                 }
