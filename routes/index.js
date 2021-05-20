@@ -5,11 +5,11 @@ const routes = require('express').Router();
 const knex = require('knex')({
     client: 'mysql',
     connection: {
-        host: "db4free.net",
+        host: "localhost",
         port: "3306",
-        database: "volma01",
-        user: "volma01",
-        password: "volmadb4free",
+        database: "Volma",
+        user: "root",
+        password: "",
     }
 });
 
@@ -150,7 +150,7 @@ routes.post('/kandidat', async (req, res) => {
 routes.get('/kandidat', async (req, res) => {
     try {
         //get all kandidat
-        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('no_urut','kandidat.id_ketua','kandidat.id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
+        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('id_kandidat', 'no_urut','id_ketua','id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
 
         //response
         res.status(200).send({
@@ -304,8 +304,8 @@ routes.get('/dashboard', async(req, res) => {
     }
 })
 
-//result voting
-routes.get('/result', async(req, res) => {
+// dashboard
+routes.get('/dashboard', async(req, res) => {
     try {
         //count jumlah pemilih
         const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
@@ -324,6 +324,56 @@ routes.get('/result', async(req, res) => {
                 kandidat: kandidat[0].jumlah
             },
         })
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+// vote result
+routes.get('/result', async(req, res) => {
+    try {
+        const kandidat = await knex('kandidat')
+                            .select('id_kandidat', 'no_urut', 'nama AS nama_ketua', 'nama_wakil', 'img_ketua', 'img_wakil', 'jumlah')
+                            .join('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua')
+                            .leftJoin(knex('vote').select('id_kandidat AS idk')
+                            .count('id_kandidat as jumlah')
+                            .groupBy('id_kandidat').as('voted'), 'voted.idk', 'kandidat.id_kandidat')
+
+        const total_voted = await knex('vote').count('id_vote AS total')
+
+        kandidat.map((val, idx) => {
+            if (kandidat[idx]['jumlah'] == null) kandidat[idx]['jumlah'] = 0
+            kandidat[idx]['persentase'] = ((kandidat[idx]['jumlah'] / total_voted[0]['total']) * 100).toFixed(2)
+        })
+
+        res.status(200).send({
+            success: true,
+            data: {
+                kandidat: kandidat,
+            }
+        })
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+// vote
+routes.post('/vote/:id_mhs/:id_kandidat', async(req, res) => {
+    try {
+        let voter = req.params.id_mhs
+
+        await knex('vote').insert({
+            "id_pemilih": voter,
+            "id_kandidat": req.params.id_kandidat,
+            "created_at": knex.fn.now(),
+            "updated_at": knex.fn.now(),
+        })
+        await knex('pemilih').where('id_pemilih', voter).update({
+            "status": 1,
+            "updated_at": knex.fn.now(),
+        })
+        
+        res.status(201).send({ success: true })
     } catch (e) {
         console.log(e)
     }
