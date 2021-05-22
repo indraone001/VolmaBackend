@@ -5,20 +5,20 @@ const bcrypt = require('bcrypt');
 //db connection
 const knex = require('knex')({
     client: 'mysql',
-    // connection: {
-    //     host: "db4free.net",
-    //     port: "3306",
-    //     database: "volma01",
-    //     user: "volma01",
-    //     password: "volmadb4free",
-    // }
     connection: {
-        host: 'localhost',
-        port: '3306',
-        database: 'Volma',
-        user: 'root',
-        password: ''
-      },
+        host: "db4free.net",
+        port: "3306",
+        database: "volma01",
+        user: "volma01",
+        password: "volmadb4free",
+    }
+    // connection: {
+    //     host: 'localhost',
+    //     port: '3306',
+    //     database: 'Volma',
+    //     user: 'root',
+    //     password: ''
+    //   },
 });
 
 //routes
@@ -309,13 +309,15 @@ routes.get('/dashboard', async(req, res) => {
         //select count kandidat
         const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
         //select periode pemilihan
+        const periode = await knex('periode').select('end');
 
         res.status(201).send({
             success : true,
             data : {
                 jumlah_pemilih: jumlah_pemilih[0].jumlah,
                 voted: total,
-                kandidat: kandidat[0].jumlah
+                kandidat: kandidat[0].jumlah,
+                periode: periode[0].end.toLocaleDateString()
             },
         })
     } catch (e) {
@@ -372,5 +374,68 @@ routes.post('/vote/:id_mhs/:id_kandidat', async(req, res) => {
         console.log(e)
     }
 })
+
+routes.post('/pemilih', async(req, res) => {
+    try {
+        // body request
+         let nim = req.body.nim;
+         let name = req.body.name;
+
+        // check nim has registered
+        let mhs = await knex('mahasiswa').where('nim', nim).select('id_mhs');
+        if(mhs[0] === undefined){
+            //response
+            res.status(400).send({
+                success: false,
+                message: "NIM has not registered",
+            })
+        }
+
+        // add new pemilih
+        let id = await knex('pemilih').insert({
+            "id_mhs": mhs[0].id_mhs,
+            "status": 0,
+            "created_at": knex.fn.now(),
+            "updated_at": knex.fn.now(),
+        })
+        //response
+        res.status(201).send({
+            success: true,
+            message: "Successfully insert pemilih",
+            data: {
+                'id_pemilih': id[0],
+                'id_mhs': mhs[0].id_mhs,
+                'status': 0
+            }
+        })
+    } catch (e) {
+        //error log
+        console.log(e)
+    }
+})
+
+routes.put('/periode', async (req, res) => {
+    try {
+        // body & params request
+        let start = req.body.start;
+        let end = req.body.end;
+
+        // update kandidat by id
+        let kandidat = await knex('periode').where('id_periode', 1).update({
+            "start": start,
+            "end": end,
+        });
+
+        //response
+        res.status(201).send({
+            success: true,
+        });
+    } catch (e) {
+        //error log
+        console.log(e);
+        next(e)
+    }
+})
+
 
 module.exports = routes;
