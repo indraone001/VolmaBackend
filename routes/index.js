@@ -1,16 +1,24 @@
 //express require
 const routes = require('express').Router();
+const bcrypt = require('bcrypt');
 
 //db connection
 const knex = require('knex')({
-  client: 'mysql',
-  connection: {
-    host: "localhost",
-    port: "3306",
-    database: "Volma",
-    user: "root",
-    password: "",
-  }
+    client: 'mysql',
+    connection: {
+        host: "db4free.net",
+        port: "3306",
+        database: "volma01",
+        user: "volma01",
+        password: "volmadb4free",
+    }
+    // connection: {
+    //     host: 'localhost',
+    //     port: '3306',
+    //     database: 'Volma',
+    //     user: 'root',
+    //     password: ''
+    //   },
 });
 
 //routes
@@ -153,20 +161,20 @@ routes.post('/kandidat', async(req, res) => {
   }
 })
 
-routes.get('/kandidat', async(req, res) => {
-  try {
-    //get all kandidat
-    let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('id_kandidat', 'no_urut', 'id_ketua', 'id_wakil', 'mahasiswa.nama', 'nama_wakil', 'visi', 'misi', 'img_ketua', 'img_wakil');
+routes.get('/kandidat', async (req, res) => {
+    try {
+        //get all kandidat
+        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('no_urut','kandidat.id_ketua','kandidat.id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
 
-    //response
-    res.status(200).send({
-      success: true,
-      data: data,
-    });
-  } catch (e) {
-    //error log
-    console.log(e);
-  }
+        //response
+        res.status(200).send({
+            success: true,
+            data : data,
+        });
+    } catch (e) {
+        //error log
+        console.log(e);
+    }
 })
 
 routes.put('/kandidat/:id', async(req, res) => {
@@ -226,28 +234,43 @@ routes.delete('/kandidat/:id', async(req, res) => {
 })
 
 //login routes controllers
-routes.post('/login', async(req, res) => {
-  try {
-    //body & params request
-    let nim = req.body.nim;
-    let password = req.body.password;
+routes.post('/login', async (req, res) => {
+    try {
+        //body & params request
+        let nim = req.body.nim;
+        let password = req.body.password;
 
-    //get mahasiswa by nim
-    let data = await knex('mahasiswa').where('nim', nim)
+        //get mahasiswa by nim
+        let data = await knex('mahasiswa').where('nim', nim)
 
-    //compare password
-    //Task: password encrypt
-    //Task: response with data
-    if (data[0].password == password) {
-      //success response
-      res.status(200).send({
-        success: true,
-      });
-    } else {
-      //failed response
-      res.status(404).send({
-        success: false,
-      });
+        //compare password
+        if(bcrypt.compareSync(password, data[0].password)){
+            //get admin
+            let admin = false;
+            let i = 0;
+            const role = await knex('admin');
+            while (i <= data.length+1) {
+                if(data[0].id_mhs == role[i].id_mhs){
+                    admin = true;
+                }
+                i++;
+            };
+            //success response
+            res.status(200).send({
+                success: true,
+                data: data,
+                admin: admin
+            });
+        }else{
+            //failed response
+            res.status(404).send({
+                success: false,
+            });
+        }
+    } catch (e) {
+        //error log
+        console.log(e);
+        next(e)
     }
   } catch (e) {
     //error log
@@ -272,72 +295,50 @@ routes.get('/pemilih', async(req, res) => {
 
 //pemilih random password
 routes.get('/pemilih/:id', async(req, res) => {
-  try {
-    let id = req.params.id;
-    //TODO : add bcrypt for password
-    let password = 'hello';
+    try {
+       let id = req.params.id;
 
-    await knex('mahasiswa').where('id_mhs', id).update({
-      "password": password,
-    });
+       let password = (Math.floor(100000 + Math.random() * 900000)).toString();
+       const hash = bcrypt.hashSync(password, 10);
 
-    res.status(201).send({
-      success: true,
-      data: password
-    })
-  } catch (e) {
-    console.log(e)
-  }
+        await knex('mahasiswa').where('id_mhs', id).update({
+            "password": hash,
+        });
+
+        res.status(201).send({
+            success: true,
+            data: password
+        })
+    } catch (e) {
+        console.log(e)
+    }
 })
 
 //pemilih Dashboard
 routes.get('/dashboard', async(req, res) => {
-  try {
-    //count jumlah pemilih
-    const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
-    //select count pemilih where status = 1
-    const voted = await knex('pemilih').count('id_pemilih AS jumlah').where('status', 1);
-    const total = ((voted[0].jumlah / jumlah_pemilih[0].jumlah) * 100).toFixed(2);
-    //select count kandidat
-    const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
-    //select periode pemilihan
+    try {
+        //count jumlah pemilih
+        const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
+        //select count pemilih where status = 1
+        const voted = await knex('pemilih').count('id_pemilih AS jumlah').where('status', 1);
+        const total = ((voted[0].jumlah/jumlah_pemilih[0].jumlah)*100).toFixed(2);
+        //select count kandidat
+        const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
+        //select periode pemilihan
+        const periode = await knex('periode').select('end');
 
-    res.status(201).send({
-      success: true,
-      data: {
-        jumlah_pemilih: jumlah_pemilih[0].jumlah,
-        voted: total,
-        kandidat: kandidat[0].jumlah
-      },
-    })
-  } catch (e) {
-    console.log(e)
-  }
-})
-
-// dashboard
-routes.get('/dashboard', async(req, res) => {
-  try {
-    //count jumlah pemilih
-    const jumlah_pemilih = await knex('pemilih').count('id_pemilih AS jumlah');
-    //select count pemilih where status = 1
-    const voted = await knex('pemilih').count('id_pemilih AS jumlah').where('status', 1);
-    const total = ((voted[0].jumlah / jumlah_pemilih[0].jumlah) * 100).toFixed(2);
-    //select count kandidat
-    const kandidat = await knex('kandidat').count('id_kandidat AS jumlah');
-    //select periode pemilihan
-
-    res.status(201).send({
-      success: true,
-      data: {
-        jumlah_pemilih: jumlah_pemilih[0].jumlah,
-        voted: total,
-        kandidat: kandidat[0].jumlah
-      },
-    })
-  } catch (e) {
-    console.log(e)
-  }
+        res.status(201).send({
+            success : true,
+            data : {
+                jumlah_pemilih: jumlah_pemilih[0].jumlah,
+                voted: total,
+                kandidat: kandidat[0].jumlah,
+                periode: periode[0].end.toLocaleDateString()
+            },
+        })
+    } catch (e) {
+        console.log(e)
+    }
 })
 
 // vote result
@@ -389,5 +390,68 @@ routes.post('/vote/:id_mhs/:id_kandidat', async(req, res) => {
     console.log(e)
   }
 })
+
+routes.post('/pemilih', async(req, res) => {
+    try {
+        // body request
+         let nim = req.body.nim;
+         let name = req.body.name;
+
+        // check nim has registered
+        let mhs = await knex('mahasiswa').where('nim', nim).select('id_mhs');
+        if(mhs[0] === undefined){
+            //response
+            res.status(400).send({
+                success: false,
+                message: "NIM has not registered",
+            })
+        }
+
+        // add new pemilih
+        let id = await knex('pemilih').insert({
+            "id_mhs": mhs[0].id_mhs,
+            "status": 0,
+            "created_at": knex.fn.now(),
+            "updated_at": knex.fn.now(),
+        })
+        //response
+        res.status(201).send({
+            success: true,
+            message: "Successfully insert pemilih",
+            data: {
+                'id_pemilih': id[0],
+                'id_mhs': mhs[0].id_mhs,
+                'status': 0
+            }
+        })
+    } catch (e) {
+        //error log
+        console.log(e)
+    }
+})
+
+routes.put('/periode', async (req, res) => {
+    try {
+        // body & params request
+        let start = req.body.start;
+        let end = req.body.end;
+
+        // update kandidat by id
+        let kandidat = await knex('periode').where('id_periode', 1).update({
+            "start": start,
+            "end": end,
+        });
+
+        //response
+        res.status(201).send({
+            success: true,
+        });
+    } catch (e) {
+        //error log
+        console.log(e);
+        next(e)
+    }
+})
+
 
 module.exports = routes;
