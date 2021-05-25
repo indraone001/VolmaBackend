@@ -272,11 +272,6 @@ routes.post('/login', async (req, res) => {
         console.log(e);
         next(e)
     }
-  } catch (e) {
-    //error log
-    console.log(e);
-    next(e)
-  }
 })
 
 //pemilih routes controller
