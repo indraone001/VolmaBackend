@@ -115,26 +115,18 @@ routes.delete('/mahasiswa/:id', async(req, res) => {
 //kandidat routes controller
 routes.post('/kandidat', async(req, res) => {
   try {
-    // body & param request
-    let id_ketua = req.body.id_ketua;
-    let id_wakil = req.body.id_wakil;
-    let nama_wakil = req.body.nama_wakil;
-    let no_urut = req.body.no_urut;
-    let img_ketua = req.body.img_ketua;
-    let img_wakil = req.body.img_wakil;
-    let visi = req.body.visi;
-    let misi = req.body.misi;
-
+    // body request
+    let data = req.body
     // insert data kandidat
-    let id = await knex('kandidat').insert({
-      "id_ketua": id_ketua,
-      "id_wakil": id_wakil,
-      "nama_wakil": nama_wakil,
-      "no_urut": no_urut,
-      "img_ketua": img_ketua,
-      "img_wakil": img_wakil,
-      "visi": visi,
-      "misi": misi,
+    let kandidat = await knex('kandidat').insert({
+      "id_ketua": data.id_ketua,
+      "id_wakil": data.id_wakil,
+      "nama_wakil": data.nama_wakil,
+      "no_urut": data.no_urut,
+      "img_ketua": data.img_ketua,
+      "img_wakil": data.img_wakil,
+      "visi": data.visi,
+      "misi": data.misi,
       "created_at": knex.fn.now(),
       "updated_at": knex.fn.now(),
     })
@@ -142,17 +134,7 @@ routes.post('/kandidat', async(req, res) => {
     //response
     res.status(201).send({
       success: true,
-      data: {
-        id: id[0],
-        id_ketua,
-        id_wakil,
-        nama_wakil,
-        no_urut,
-        img_ketua,
-        img_wakil,
-        visi,
-        misi,
-      }
+      data: { kandidat }
     });
   } catch (e) {
     //error log
@@ -180,26 +162,18 @@ routes.get('/kandidat', async (req, res) => {
 routes.put('/kandidat/:id', async(req, res) => {
   try {
     // body & params request
-    let id = req.params.id;
-    let id_ketua = req.body.id_ketua;
-    let id_wakil = req.body.id_wakil;
-    let nama_wakil = req.body.nama_wakil;
-    let no_urut = req.body.no_urut;
-    let img_ketua = req.body.img_ketua;
-    let img_wakil = req.body.img_wakil;
-    let visi = req.body.visi;
-    let misi = req.body.misi;
-
+    let data = req.params
+    
     // update kandidat by id
     let kandidat = await knex('kandidat').where('id_kandidat', id).update({
-      "id_ketua": id_ketua,
-      "id_wakil": id_wakil,
-      "nama_wakil": nama_wakil,
-      "no_urut": no_urut,
-      "img_ketua": img_ketua,
-      "img_wakil": img_wakil,
-      "visi": visi,
-      "misi": misi,
+      "id_ketua": data.id_ketua,
+      "id_wakil": data.id_wakil,
+      "nama_wakil": data.nama_wakil,
+      "no_urut": data.no_urut,
+      "img_ketua": data.img_ketua,
+      "img_wakil": data.img_wakil,
+      "visi": data.visi,
+      "misi": data.misi,
       "updated_at": knex.fn.now(),
     });
 
@@ -448,5 +422,20 @@ routes.put('/periode', async (req, res) => {
     }
 })
 
+routes.delete('/pemilih/:id', async(req, res) => {
+  try {
+    //delete mahasiswa by id
+    await knex('pemilih').where('id_pemilih', req.params.id).del()
+
+    //response
+    res.status(200).send({
+      success: true,
+      message: 'Successfully delete pemilih'
+    })
+  } catch (e) {
+    //error log
+    console.log(e)
+  }
+})
 
 module.exports = routes;
