@@ -146,7 +146,7 @@ routes.post('/kandidat', async(req, res) => {
 routes.get('/kandidat', async (req, res) => {
     try {
         //get all kandidat
-        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('no_urut','kandidat.id_ketua','kandidat.id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
+        let data = await knex.from('kandidat').innerJoin('mahasiswa', 'mahasiswa.id_mhs', 'kandidat.id_ketua').select('id_kandidat', 'no_urut','kandidat.id_ketua','kandidat.id_wakil', 'mahasiswa.nama', 'nama_wakil','visi','misi','img_ketua','img_wakil');
 
         //response
         res.status(200).send({
