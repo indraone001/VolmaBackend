@@ -216,7 +216,7 @@ routes.post('/login', async(req, res) => {
     let password = req.body.password;
 
     //get mahasiswa by nim
-    let data = await knex('mahasiswa').where('nim', nim).innerJoin('pemilih', 'mahasiswa.id_mhs', 'pemilih.id_mhs').select(['mahasiswa.*', 'pemilih.id_pemilih'], 'status');
+    let data = await knex('mahasiswa').where('nim', nim).innerJoin('pemilih', 'mahasiswa.id_mhs', 'pemilih.id_mhs').select('mahasiswa.*', 'id_pemilih', 'status');
 
     //compare password
     if (bcrypt.compareSync(password, data[0].password)) {
