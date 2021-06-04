@@ -13,7 +13,7 @@ exports.up = function(knex) {
     table.string('visi');
     table.text('misi');
     table.timestamps();
-  })  
+  })
 };
 
 // drop table if exist

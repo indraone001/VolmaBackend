@@ -96,10 +96,17 @@ routes.put('/mahasiswa/:id', async(req, res) => {
   }
 })
 
+//delete mahasiswa by id
 routes.delete('/mahasiswa/:id', async(req, res) => {
   try {
-    //delete mahasiswa by id
-    await knex('mahasiswa').where('id_mhs', req.params.id).del()
+    let id = req.params.id
+
+    // check if mhs exists in pemilih table
+    let voter = await knex('pemilih').where('id_mhs', id)
+    if (voter.length != 0) // if exists in pemilih table
+      await knex('pemilih').where('id_pemilih', voter[0].id_pemilih).del()
+
+    await knex('mahasiswa').where('id_mhs', id).del()
 
     //response
     res.status(200).send({
@@ -194,6 +201,10 @@ routes.delete('/kandidat/:id', async(req, res) => {
     //body and params request
     let id = req.params.id;
 
+    let voted = await knex('vote').where('id_kandidat', id)
+    if (voted.length != 0)
+      await knex('vote').where('id_kandidat', id).del()
+
     //delete kandidat by id
     await knex('kandidat').where('id_kandidat', id).del()
 
@@ -216,7 +227,7 @@ routes.post('/login', async(req, res) => {
     let password = req.body.password;
 
     //get mahasiswa by nim
-    let data = await knex('mahasiswa').where('nim', nim).innerJoin('pemilih', 'mahasiswa.id_mhs', 'pemilih.id_mhs').select(['mahasiswa.*', 'pemilih.id_pemilih'], 'status');
+    let data = await knex('mahasiswa').where('nim', nim).innerJoin('pemilih', 'mahasiswa.id_mhs', 'pemilih.id_mhs').select('mahasiswa.*', 'id_pemilih', 'status');
 
     //compare password
     if (bcrypt.compareSync(password, data[0].password)) {
@@ -423,9 +434,15 @@ routes.put('/periode', async(req, res) => {
   }
 })
 
+//delete mahasiswa by id
 routes.delete('/pemilih/:id', async(req, res) => {
   try {
-    //delete mahasiswa by id
+    let id = req.params.id
+
+    let voted = await knex('vote').where('id_pemilih', id)
+    if (voted.length != 0)
+      await knex('vote').where('id_vote', voted[0].id_vote).del()
+
     await knex('pemilih').where('id_pemilih', req.params.id).del()
 
     //response
