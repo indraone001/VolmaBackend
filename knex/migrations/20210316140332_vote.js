@@ -4,8 +4,14 @@ exports.up = function(knex) {
   return knex.schema.createTable('vote', table => {
       // columns: id_vote, id_pemilih, id_kandidat, time
       table.increments('id_vote');
-      table.integer('id_pemilih').unsigned().references('pemilih.id_pemilih')
-      table.integer('id_kandidat').unsigned().references('kandidat.id_kandidat')
+      table.integer('id_pemilih').unsigned()
+        .references('pemilih.id_pemilih')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
+      table.integer('id_kandidat').unsigned()
+        .references('kandidat.id_kandidat')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE');
       table.timestamps();
   })
 };

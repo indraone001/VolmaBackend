@@ -4,8 +4,14 @@ exports.up = function(knex) {
   return knex.schema.createTable('kandidat', table => {
     // columns: id_kandidat, id_ketua, id_wakil, no_urut, visi, misi, time
     table.increments('id_kandidat');
-    table.integer('id_ketua').unsigned().references('mahasiswa.id_mhs');
-    table.integer('id_wakil').unsigned().references('mahasiswa.id_mhs');
+    table.integer('id_ketua').unsigned()
+      .references('mahasiswa.id_mhs')
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE');
+    table.integer('id_wakil').unsigned()
+      .references('mahasiswa.id_mhs')
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE');
     table.string('nama_wakil');
     table.string('img_ketua');
     table.string('img_wakil');

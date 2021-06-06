@@ -4,7 +4,10 @@ exports.up = function(knex) {
     return knex.schema.createTable('admin', table => {
         // columns: id_admin, id_mhs, time
         table.increments('id_admin');
-        table.integer('id_mhs').unsigned().references('mahasiswa.id_mhs')
+        table.integer('id_mhs').unsigned()
+            .references('mahasiswa.id_mhs')
+            .onUpdate('CASCADE')
+            .onDelete('CASCADE');
         table.timestamps();
     })
 };
