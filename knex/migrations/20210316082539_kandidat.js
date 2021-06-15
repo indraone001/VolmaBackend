@@ -12,14 +12,13 @@ exports.up = function(knex) {
       .references('mahasiswa.id_mhs')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
-    table.string('nama_wakil');
     table.string('img_ketua');
     table.string('img_wakil');
     table.integer('no_urut');
     table.string('visi');
     table.text('misi');
     table.timestamps();
-  })  
+  })
 };
 
 // drop table if exist
