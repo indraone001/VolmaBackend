@@ -486,4 +486,39 @@ routes.delete('/pemilih/:id', async(req, res) => {
   }
 })
 
+// get mahasiswa to add kandidat
+routes.get('/kandidat/add/get-student', async(req, res) => {
+  try {
+    let data = await knex('mahasiswa')
+      .leftJoin('kandidat as k1', 'mahasiswa.id_mhs', 'k1.id_ketua')
+      .leftJoin('kandidat as k2', 'mahasiswa.id_mhs', 'k2.id_wakil')
+      .where('k1.id_ketua', null).where('k2.id_wakil', null)
+      .select('id_mhs', 'nim', 'nama')
+
+    res.status(200).send({
+      success: true,
+      data
+    })
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+// get mahasiswa that not vote yet
+routes.get('/pemilih/add/get-student', async(req, res) => {
+  try {
+    let data = await knex('mahasiswa')
+      .leftJoin('pemilih', 'pemilih.id_mhs', 'mahasiswa.id_mhs')
+      .where('pemilih.id_pemilih', null)
+      .select('mahasiswa.id_mhs', 'nim', 'nama')
+
+    res.status(200).send({
+      success: true,
+      data
+    })
+  } catch (e) {
+    console.log(e)
+  }
+})
+
 module.exports = routes;
